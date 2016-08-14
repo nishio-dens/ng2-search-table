@@ -6,10 +6,15 @@ import {Component, Input, Output, OnChanges, EventEmitter, HostBinding} from "@a
   inputs: ['name', 'model'],
   outputs: ['eventEmitter'],
   host: {
-    '(click)': 'emitSomeEvent()'
+    '(click)': 'onToggleSort()'
   },
   template: `
     {{model.displayName}}
+    <i class="pull-right fa"
+    [ngClass]="{'fa-sort': model.direction != 'asc' && model.direction != 'desc',
+      'fa-sort-asc': model.direction == 'asc',
+      'fa-sort-desc': model.direction == 'desc'}"
+    aria-hidden="true"></i>
   `
 })
 
@@ -19,11 +24,29 @@ export class SortableHeaderComponent {
   eventEmitter: any = new EventEmitter();
 
   @HostBinding("hidden") isHidden: boolean = false;
+  @HostBinding("class.sort-asc") get asc() { return this.model.direction == 'asc'; }
+  @HostBinding("class.sort-desc") get desc() { return this.model.direction == 'desc'; }
 
   ngOnInit() {
   }
 
-  public emitSomeEvent() {
-    this.eventEmitter.emit("Something" + this.name);
+  public onToggleSort() {
+    switch (this.model.direction) {
+      case 'asc':
+        this.model.direction = 'desc';
+        break;
+      case 'desc':
+        this.model.direction = 'asc';
+        break;
+      default:
+        this.model.direction = 'asc';
+        break;
+    }
+
+    this.eventEmitter.emit({
+      value: this.model.direction,
+      model: this.model,
+      name: this.name
+    });
   }
 }

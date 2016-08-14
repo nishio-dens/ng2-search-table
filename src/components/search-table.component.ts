@@ -41,6 +41,7 @@ export class SearchTableComponent implements OnInit {
 
   public dataRows: any[] = [];
   public headerComponents: any[] = [];
+  private sortCondition: any = {};
   private filterConditions: any = {};
 
   constructor(
@@ -78,38 +79,66 @@ export class SearchTableComponent implements OnInit {
 
     this.headerComponents.forEach(header => {
       this.componentResolver.resolveComponent(header.headerComponent).then((factory) => {
-        let c: any = this.createTableComponent(factory, header, this.headerViewComponents);
+        let c: any = this.createHeaderTableComponent(factory, header, this.headerViewComponents);
         header.headerInstance = c.instance;
       });
 
       this.componentResolver.resolveComponent(header.filterComponent).then((factory) => {
-        let c: any = this.createTableComponent(factory, header, this.headerFilterComponents);
+        let c: any = this.createFilterTableComponent(factory, header, this.headerFilterComponents);
         header.filterInstance = c.instance;
       });
     });
   }
 
-  public dummyEvent() : void {
-    let searchParams: URLSearchParams = new URLSearchParams();
-    searchParams.set("page", "1");
-    searchParams.set("per", "20");
-
-    console.log(this.dataRows);
-    console.log(this.config);
-    this.dataRows = [
-      {id: 1},
-      {id: 2},
-    ];
+  ngAfterViewInit(): void {
+    this.search();
   }
 
-  private createTableComponent(factory: any, header: any, viewComponents: any) : any {
+  private createHeaderTableComponent(factory: any, header: any, viewComponents: any) : any {
+    let c: any = viewComponents.createComponent(factory);
+    c.instance.name = header.name;
+    c.instance.model = header.model;
+    c.instance.eventEmitter.subscribe((v: any) => {
+      this.sortCondition = {};
+      this.sortCondition[v.name] = v.value;
+      this.clearHeaderSortDirection(v.name);
+      this.search();
+    });
+    return c;
+  }
+
+  private createFilterTableComponent(factory: any, header: any, viewComponents: any) : any {
     let c: any = viewComponents.createComponent(factory);
     c.instance.name = header.name;
     c.instance.model = header.model;
     c.instance.eventEmitter.subscribe((v: any) => {
       this.filterConditions[v.name] = v.value;
-      this.searchTableService.search(this.config.url);
+      this.search();
     });
     return c;
+  }
+
+  private clearHeaderSortDirection(without?: string) : void {
+    this.headerComponents.forEach((v: any) => {
+      if (v.name != without) {
+        v.headerInstance.model.direction = "";
+      }
+    });
+  }
+
+  private search(): void {
+    let searchParams = {
+      page: 1,
+      per: 20,
+      sort: this.sortCondition,
+      filter: this.filterConditions
+    };
+    this
+      .searchTableService
+      .search(this.config.url, searchParams)
+      .subscribe((r: any) => {
+        // TODO: set page per condition
+        this.dataRows = r.results;
+      });
   }
 }

@@ -14,7 +14,7 @@ import {FormControl} from "@angular/forms";
 export class TableTextFilterComponent {
   name: string;
   model: any = {};
-  debounceMillSeconds: number = 200;
+  debounceMillSeconds: number = 300;
   eventEmitter: any = new EventEmitter();
 
   @HostBinding("hidden") isHidden: boolean = false;

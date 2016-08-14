@@ -1,5 +1,5 @@
 import {Injectable} from "@angular/core";
-import {Http, URLSearchParams} from "@angular/http";
+import {Http, URLSearchParams, RequestOptions} from "@angular/http";
 
 @Injectable()
 export class SearchTableService {
@@ -17,7 +17,7 @@ export class SearchTableService {
   //    "something": "someValue",
   //    "another": "1"
   // }
-  public search(searchUrl: string, options?: any) {
+  public search(searchUrl: string, options?: any): any {
     let page = options && options.page || 1;
     let per = options && options.per || 20;
     let sort = options && options.sort;
@@ -26,19 +26,22 @@ export class SearchTableService {
     searchParams.set("page", page.toString());
     searchParams.set("per", per.toString());
     if (sort) {
-      sort.forEach((key: string) => {
+      Object.keys(sort).forEach((key: any) => {
         searchParams.set("sort[" + key + "]", sort[key]);
       });
     }
     if (filter) {
-      filter.forEach((key: string) => {
-        searchParams.set("filter[" + key + "]", sort[key]);
+      Object.keys(filter).forEach((key: string) => {
+        searchParams.set("filter[" + key + "]", filter[key]);
       });
     }
 
-    this
+    let requestOptions = new RequestOptions({
+      search: searchParams
+    });
+    return this
       .http
-      .get(searchUrl, searchParams)
+      .get(searchUrl, requestOptions)
       .map(r => r.json())
       .map(r => {
         return {
