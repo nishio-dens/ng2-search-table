@@ -1,20 +1,19 @@
 import {
   Component, OnInit, ViewContainerRef,
-  ComponentResolver, ViewChild
+  ComponentResolver, ViewChild, Compiler
 } from "@angular/core";
-import {SimpleHeaderComponent} from "./header/simple_header.component";
-import {SortableHeaderComponent} from "./header/sortable_header.component";
-import {TableTextFilterComponent} from "./table-filter/table_text_filter.component";
-import {URLSearchParams} from "@angular/http";
+import {SimpleHeaderComponent} from "./header/simple-header.component";
+import {SortableHeaderComponent} from "./header/sortable-header.component";
+import {TableTextFilterComponent} from "./table-filter/table-text-filter.component";
 import {SearchTableService} from "../services/search-table.service";
 
 @Component({
   moduleId: module.id,
   selector: "search-table",
   inputs: [
-    'tableClass',
-    'columns',
-    'config'
+    "tableClass",
+    "columns",
+    "config"
   ],
   template: `
   <table [ngClass]="tableClass">
@@ -32,8 +31,8 @@ import {SearchTableService} from "../services/search-table.service";
 })
 
 export class SearchTableComponent implements OnInit {
-  @ViewChild('headerViewComponents', {read: ViewContainerRef}) headerViewComponents: any;
-  @ViewChild('headerFilterComponents', {read: ViewContainerRef}) headerFilterComponents: any;
+  @ViewChild("headerViewComponents", {read: ViewContainerRef}) headerViewComponents: any;
+  @ViewChild("headerFilterComponents", {read: ViewContainerRef}) headerFilterComponents: any;
 
   tableClass: string;
   columns: any[];
@@ -44,9 +43,14 @@ export class SearchTableComponent implements OnInit {
   private sortCondition: any = {};
   private filterConditions: any = {};
 
+  private currentPage: number = 1;
+  private pagePer: number = 20;
+  private totalCount: number = 0;
+
   constructor(
     private componentResolver: ComponentResolver,
-    private searchTableService: SearchTableService
+    private searchTableService: SearchTableService,
+    private compiler: Compiler
   ) {}
 
   ngOnInit() {
@@ -78,12 +82,12 @@ export class SearchTableComponent implements OnInit {
     ];
 
     this.headerComponents.forEach(header => {
-      this.componentResolver.resolveComponent(header.headerComponent).then((factory) => {
+      this.compiler.compileComponentAsync(header.headerComponent).then((factory) => {
         let c: any = this.createHeaderTableComponent(factory, header, this.headerViewComponents);
         header.headerInstance = c.instance;
       });
 
-      this.componentResolver.resolveComponent(header.filterComponent).then((factory) => {
+      this.compiler.compileComponentAsync(header.filterComponent).then((factory) => {
         let c: any = this.createFilterTableComponent(factory, header, this.headerFilterComponents);
         header.filterInstance = c.instance;
       });
@@ -94,7 +98,31 @@ export class SearchTableComponent implements OnInit {
     this.search();
   }
 
-  private createHeaderTableComponent(factory: any, header: any, viewComponents: any) : any {
+  getCurrentPage(): number {
+    return this.currentPage;
+  }
+
+  getPagePer(): number {
+    return this.pagePer;
+  }
+
+  getTotalCount(): number {
+    return this.totalCount;
+  }
+
+  setCurrentPage(page: number): void {
+    this.currentPage = page;
+    this.search();
+  }
+
+  private setTotalCount(count: number): void {
+    if (this.totalCount !== count) {
+      this.currentPage = 1;
+    }
+    this.totalCount = count;
+  }
+
+  private createHeaderTableComponent(factory: any, header: any, viewComponents: any): any {
     let c: any = viewComponents.createComponent(factory);
     c.instance.name = header.name;
     c.instance.model = header.model;
@@ -107,7 +135,7 @@ export class SearchTableComponent implements OnInit {
     return c;
   }
 
-  private createFilterTableComponent(factory: any, header: any, viewComponents: any) : any {
+  private createFilterTableComponent(factory: any, header: any, viewComponents: any): any {
     let c: any = viewComponents.createComponent(factory);
     c.instance.name = header.name;
     c.instance.model = header.model;
@@ -118,9 +146,9 @@ export class SearchTableComponent implements OnInit {
     return c;
   }
 
-  private clearHeaderSortDirection(without?: string) : void {
+  private clearHeaderSortDirection(without?: string): void {
     this.headerComponents.forEach((v: any) => {
-      if (v.name != without) {
+      if (v.name !== without) {
         v.headerInstance.model.direction = "";
       }
     });
@@ -128,8 +156,8 @@ export class SearchTableComponent implements OnInit {
 
   private search(): void {
     let searchParams = {
-      page: 1,
-      per: 20,
+      page: this.getCurrentPage(),
+      per: this.getPagePer(),
       sort: this.sortCondition,
       filter: this.filterConditions
     };
@@ -137,7 +165,7 @@ export class SearchTableComponent implements OnInit {
       .searchTableService
       .search(this.config.url, searchParams)
       .subscribe((r: any) => {
-        // TODO: set page per condition
+        this.setTotalCount(r.totalCount);
         this.dataRows = r.results;
       });
   }

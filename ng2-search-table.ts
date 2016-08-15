@@ -6,9 +6,9 @@ import {BrowserModule} from "@angular/platform-browser";
 import "rxjs/Rx";
 
 import {SearchTableComponent} from "./src/components/search-table.component";
-import {SimpleHeaderComponent} from "./src/components/header/simple_header.component";
-import {SortableHeaderComponent} from "./src/components/header/sortable_header.component";
-import {TableTextFilterComponent} from "./src/components/table-filter/table_text_filter.component";
+import {SimpleHeaderComponent} from "./src/components/header/simple-header.component";
+import {SortableHeaderComponent} from "./src/components/header/sortable-header.component";
+import {TableTextFilterComponent} from "./src/components/table-filter/table-text-filter.component";
 import {SearchTableService} from "./src/services/search-table.service";
 
 @NgModule({
@@ -23,7 +23,7 @@ import {SearchTableService} from "./src/services/search-table.service";
     SearchTableComponent,
     SimpleHeaderComponent,
     SortableHeaderComponent,
-    TableTextFilterComponent
+    TableTextFilterComponent,
   ],
   providers: [
     SearchTableService
@@ -32,7 +32,7 @@ import {SearchTableService} from "./src/services/search-table.service";
     SearchTableComponent,
     SimpleHeaderComponent,
     SortableHeaderComponent,
-    TableTextFilterComponent
+    TableTextFilterComponent,
   ]
 })
 export class Ng2SearchTableModule {
