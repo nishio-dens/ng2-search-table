@@ -2,10 +2,9 @@ import {
   Component, OnInit, ViewContainerRef,
   ComponentResolver, ViewChild, Compiler
 } from "@angular/core";
-import {SimpleHeaderComponent} from "./header/simple-header.component";
-import {SortableHeaderComponent} from "./header/sortable-header.component";
-import {TableTextFilterComponent} from "./table-filter/table-text-filter.component";
 import {SearchTableService} from "../services/search-table.service";
+import {NoHeaderComponent} from "./header/no-header.component";
+import {NoFilterComponent} from "./table-filter/no-filter.component";
 
 @Component({
   moduleId: module.id,
@@ -54,40 +53,15 @@ export class SearchTableComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.headerComponents = [
-      {
-        name: "id",
-        model: {displayName: "Id"},
-        headerComponent: SortableHeaderComponent,
-        filterComponent: TableTextFilterComponent,
-        headerInstance: null,
-        filterInstance: null
-      },
-      {
-        name: "name",
-        model: {displayName: "Name"},
-        headerComponent: SortableHeaderComponent,
-        filterComponent: TableTextFilterComponent,
-        headerInstance: null,
-        filterInstance: null
-      },
-      {
-        name: "price",
-        model: {displayName: "Price"},
-        headerComponent: SimpleHeaderComponent,
-        filterComponent: TableTextFilterComponent,
-        headerInstance: null,
-        filterInstance: null
-      },
-    ];
-
-    this.headerComponents.forEach(header => {
-      this.compiler.compileComponentAsync(header.headerComponent).then((factory) => {
+    this.columns.forEach(header => {
+      let headerComponent = header.headerComponent || NoHeaderComponent;
+      this.compiler.compileComponentAsync(headerComponent).then((factory) => {
         let c: any = this.createHeaderTableComponent(factory, header, this.headerViewComponents);
         header.headerInstance = c.instance;
       });
 
-      this.compiler.compileComponentAsync(header.filterComponent).then((factory) => {
+      let filterComponent = header.filterComponent || NoFilterComponent;
+      this.compiler.compileComponentAsync(filterComponent).then((factory) => {
         let c: any = this.createFilterTableComponent(factory, header, this.headerFilterComponents);
         header.filterInstance = c.instance;
       });

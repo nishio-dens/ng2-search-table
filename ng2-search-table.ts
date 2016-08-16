@@ -5,11 +5,13 @@ import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {BrowserModule} from "@angular/platform-browser";
 import "rxjs/Rx";
 
-import {SearchTableComponent} from "./src/components/search-table.component";
-import {SimpleHeaderComponent} from "./src/components/header/simple-header.component";
-import {SortableHeaderComponent} from "./src/components/header/sortable-header.component";
-import {TableTextFilterComponent} from "./src/components/table-filter/table-text-filter.component";
-import {SearchTableService} from "./src/services/search-table.service";
+import {SearchTableComponent} from "./components/search-table.component";
+import {NoHeaderComponent} from "./components/header/no-header.component";
+import {SimpleHeaderComponent} from "./components/header/simple-header.component";
+import {SortableHeaderComponent} from "./components/header/sortable-header.component";
+import {NoFilterComponent} from "./components/table-filter/no-filter.component";
+import {TableTextFilterComponent} from "./components/table-filter/table-text-filter.component";
+import {SearchTableService} from "./services/search-table.service";
 
 @NgModule({
   imports: [
@@ -21,8 +23,12 @@ import {SearchTableService} from "./src/services/search-table.service";
   ],
   declarations: [
     SearchTableComponent,
+    // Header
+    NoHeaderComponent,
     SimpleHeaderComponent,
     SortableHeaderComponent,
+    // Filter
+    NoFilterComponent,
     TableTextFilterComponent,
   ],
   providers: [
@@ -30,8 +36,12 @@ import {SearchTableService} from "./src/services/search-table.service";
   ],
   exports: [
     SearchTableComponent,
+    // Header
+    NoHeaderComponent,
     SimpleHeaderComponent,
     SortableHeaderComponent,
+    // Filter
+    NoFilterComponent,
     TableTextFilterComponent,
   ]
 })
