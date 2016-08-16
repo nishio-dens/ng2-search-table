@@ -3,15 +3,16 @@ import {FormControl} from "@angular/forms";
 
 @Component({
   moduleId: module.id,
-  selector: "th[text-filter]",
+  selector: "th[from-to-text-filter]",
   inputs: ["name", "model", "debounceMillSeconds"],
   outputs: ["eventEmitter"],
   template: `
-    <input class="form-control input-sm" [formControl]="termControl" [(ngModel)]="term" />
+    <input class="form-control input-sm" [formControl]="termFromControl" [(ngModel)]="term" />
+    <input class="form-control input-sm" [formControl]="termToControl" [(ngModel)]="term" />
   `
 })
 
-export class TextFilterComponent {
+export class FromToTextFilter {
   name: string;
   model: any = {};
   debounceMillSeconds: number = 300;

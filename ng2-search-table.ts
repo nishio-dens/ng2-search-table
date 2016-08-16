@@ -15,6 +15,7 @@ import {SortableHeaderComponent} from "./components/header/sortable-header.compo
 import {NoFilterComponent} from "./components/table-filter/no-filter.component";
 import {TextFilterComponent} from "./components/table-filter/text-filter.component";
 import {SelectFilterComponent} from "./components/table-filter/select-filter.component";
+import {FromToTextFilterComponent} from "./components/table-filter/from-to-text-filter.component";
 
 @NgModule({
   imports: [
@@ -33,7 +34,8 @@ import {SelectFilterComponent} from "./components/table-filter/select-filter.com
     // Filter
     NoFilterComponent,
     TextFilterComponent,
-    SelectFilterComponent
+    SelectFilterComponent,
+    FromToTextFilterComponent
   ],
   providers: [
     SearchTableService
@@ -47,7 +49,8 @@ import {SelectFilterComponent} from "./components/table-filter/select-filter.com
     // Filter
     NoFilterComponent,
     TextFilterComponent,
-    SelectFilterComponent
+    SelectFilterComponent,
+    FromToTextFilterComponent
   ]
 })
 export class Ng2SearchTableModule {
