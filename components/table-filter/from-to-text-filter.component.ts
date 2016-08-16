@@ -7,12 +7,18 @@ import {FormControl} from "@angular/forms";
   inputs: ["name", "model", "debounceMillSeconds"],
   outputs: ["eventEmitter"],
   template: `
-    <input class="form-control input-sm" [formControl]="termFromControl" [(ngModel)]="term" />
-    <input class="form-control input-sm" [formControl]="termToControl" [(ngModel)]="term" />
+    <div class="row">
+      <div class="col-xs-6">
+        <input class="form-control input-sm" [formControl]="termFromControl" [(ngModel)]="fromTerm" />
+      </div>
+      <div class="col-xs-6">
+        <input class="form-control input-sm" [formControl]="termToControl" [(ngModel)]="toTerm" />
+      </div>
+    </div>
   `
 })
 
-export class FromToTextFilter {
+export class FromToTextFilterComponent {
   name: string;
   model: any = {};
   debounceMillSeconds: number = 300;
@@ -20,23 +26,28 @@ export class FromToTextFilter {
 
   @HostBinding("hidden") isHidden: boolean = false;
 
-  term: string;
-  termControl: FormControl;
+  fromTerm: string;
+  toTerm: string;
+  termFromControl: FormControl;
+  termToControl: FormControl;
 
   ngOnInit() {
-    this.termControl = new FormControl();
-    this.termControl.valueChanges.debounceTime(this.debounceMillSeconds).subscribe(newValue => {
-      if (this.termControl.dirty) {
-        this.eventEmitter.emit({
-          value: newValue,
-          model: this.model,
-          name: this.name
-        });
-      }
-    });
+    this.termFromControl = new FormControl();
+    this.termToControl = new FormControl();
+
+    // this.termControl.valueChanges.debounceTime(this.debounceMillSeconds).subscribe(newValue => {
+    //   if (this.termControl.dirty) {
+    //     this.eventEmitter.emit({
+    //       value: newValue,
+    //       model: this.model,
+    //       name: this.name
+    //     });
+    //   }
+    // });
   }
 
   reset(): void {
-    this.term = "";
+    this.fromTerm = "";
+    this.toTerm = "";
   }
 }

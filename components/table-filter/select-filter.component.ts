@@ -7,7 +7,7 @@ import {FormControl} from "@angular/forms";
   inputs: ["name", "model"],
   outputs: ["eventEmitter"],
   template: `
-  <select class="form-control"
+  <select class="form-control input-sm"
           [formControl]="selectControl">
     <option *ngFor="let cond of model.selectValues" value="{{cond.id}}">
       {{cond.name}}
