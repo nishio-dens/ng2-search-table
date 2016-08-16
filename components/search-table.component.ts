@@ -115,13 +115,14 @@ export class SearchTableComponent implements OnInit {
     c.instance.model = header.model;
     c.instance.eventEmitter.subscribe((v: any) => {
       this.filterConditions[v.name] = v.value;
+      this.currentPage = 1;
       this.search();
     });
     return c;
   }
 
   private clearHeaderSortDirection(without?: string): void {
-    this.headerComponents.forEach((v: any) => {
+    this.columns.forEach((v: any) => {
       if (v.name !== without) {
         v.headerInstance.model.direction = "";
       }

@@ -2,9 +2,9 @@ import {Component, Input, Output, OnChanges, EventEmitter, HostBinding} from "@a
 
 @Component({
   moduleId: module.id,
-  selector: 'th[simple-header]',
-  inputs: ['name', 'model'],
-  outputs: ['eventEmitter'],
+  selector: "th[simple-header]",
+  inputs: ["name", "model"],
+  outputs: ["eventEmitter"],
   template: `
     {{model.displayName}}
   `

@@ -3,7 +3,7 @@ import {FormControl} from "@angular/forms";
 
 @Component({
   moduleId: module.id,
-  selector: 'th[table-text-filter]',
+  selector: 'th[text-filter]',
   inputs: ['name', 'model', 'debounceMillSeconds'],
   outputs: ['eventEmitter'],
   template: `
@@ -11,7 +11,7 @@ import {FormControl} from "@angular/forms";
   `
 })
 
-export class TableTextFilterComponent {
+export class TextFilterComponent {
   name: string;
   model: any = {};
   debounceMillSeconds: number = 300;
