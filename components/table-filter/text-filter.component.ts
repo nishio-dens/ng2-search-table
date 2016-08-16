@@ -3,9 +3,9 @@ import {FormControl} from "@angular/forms";
 
 @Component({
   moduleId: module.id,
-  selector: 'th[text-filter]',
-  inputs: ['name', 'model', 'debounceMillSeconds'],
-  outputs: ['eventEmitter'],
+  selector: "th[text-filter]",
+  inputs: ["name", "model", "debounceMillSeconds"],
+  outputs: ["eventEmitter"],
   template: `
     <input class="form-control input-sm" [formControl]="termControl" [(ngModel)]="term" />
   `
@@ -25,7 +25,7 @@ export class TextFilterComponent {
   ngOnInit() {
     this.termControl = new FormControl();
     this.termControl.valueChanges.debounceTime(this.debounceMillSeconds).subscribe(newValue => {
-      if(this.termControl.dirty) {
+      if (this.termControl.dirty) {
         this.eventEmitter.emit({
           value: newValue,
           model: this.model,
