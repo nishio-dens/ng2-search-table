@@ -53,6 +53,7 @@ export class SearchTableComponent implements OnInit {
   ) {}
 
   ngOnInit() {
+    this.parseConfig(this.config);
     this.columns.forEach(header => {
       let headerComponent = header.headerComponent || NoHeaderComponent;
       this.compiler.compileComponentAsync(headerComponent).then((factory) => {
@@ -87,6 +88,17 @@ export class SearchTableComponent implements OnInit {
   setCurrentPage(page: number): void {
     this.currentPage = page;
     this.search();
+  }
+
+  setPagePer(per: number): void {
+    this.pagePer = per;
+    this.setCurrentPage(1);
+  }
+
+  private parseConfig(config: any): void {
+    if (config.defaultPagePer) {
+      this.pagePer = config.defaultPagePer;
+    }
   }
 
   private setTotalCount(count: number): void {

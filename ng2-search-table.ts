@@ -17,6 +17,19 @@ import {TextFilterComponent} from "./components/table-filter/text-filter.compone
 import {SelectFilterComponent} from "./components/table-filter/select-filter.component";
 import {FromToTextFilterComponent} from "./components/table-filter/from-to-text-filter.component";
 
+// exports
+export {SearchTableComponent} from "./components/search-table.component";
+export {SearchTableService} from "./services/search-table.service";
+
+export {NoHeaderComponent} from "./components/header/no-header.component";
+export {SimpleHeaderComponent} from "./components/header/simple-header.component";
+export {SortableHeaderComponent} from "./components/header/sortable-header.component";
+
+export {NoFilterComponent} from "./components/table-filter/no-filter.component";
+export {TextFilterComponent} from "./components/table-filter/text-filter.component";
+export {SelectFilterComponent} from "./components/table-filter/select-filter.component";
+export {FromToTextFilterComponent} from "./components/table-filter/from-to-text-filter.component";
+
 @NgModule({
   imports: [
     BrowserModule,
