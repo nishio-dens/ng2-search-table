@@ -4,4 +4,5 @@ export interface TableFilter {
   eventEmitter: any;
 
   setValue(name: string, value: any): void;
+  setVisibility(visible: boolean): void;
 }

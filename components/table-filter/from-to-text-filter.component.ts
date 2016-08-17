@@ -59,6 +59,10 @@ export class FromToTextFilterComponent implements TableFilter {
     }
   }
 
+  setVisibility(visible: boolean): void {
+    this.isHidden = !visible;
+  }
+
   private setValueChangeEmitter(control: FormControl, controlName: string) {
     control.valueChanges.subscribe(newValue => {
       let value = (control === this.termFromControl ? this.fromTerm : this.toTerm) || "";

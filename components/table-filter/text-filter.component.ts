@@ -38,4 +38,8 @@ export class TextFilterComponent implements TableFilter {
   setValue(name: string, value: any): void {
     this.term = value;
   }
+
+  setVisibility(visible: boolean): void {
+    this.isHidden = !visible;
+  }
 }

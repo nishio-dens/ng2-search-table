@@ -52,6 +52,7 @@ export class SearchTableComponent implements OnInit {
   private headerInstances: any = {};
   private filterInstances: any = {};
   private defaultValues: any = {};
+  private visibilities: any = {};
 
   constructor(
     private componentResolver: ComponentResolver,
@@ -138,6 +139,16 @@ export class SearchTableComponent implements OnInit {
     this.resetCurrentPage();
   }
 
+  setVisibility(name: string, visible: boolean): void {
+    if (this.headerInstances[name]) {
+      this.headerInstances[name].setVisibility(visible);
+    }
+    if (this.filterInstances[name]) {
+      this.filterInstances[name].setVisibility(visible);
+    }
+    this.visibilities[name] = visible;
+  }
+
   private parseConfig(config: any): void {
     if (config.defaultPagePer) {
       this.pagePer = config.defaultPagePer;
@@ -163,6 +174,10 @@ export class SearchTableComponent implements OnInit {
     if (this.sortCondition[header.name]) {
       c.instance.model.direction = this.sortCondition[header.name];
     }
+    if (this.visibilities[header.name] !== true && this.visibilities[header.name] !== false) {
+      this.visibilities[header.name] = true;
+    }
+    c.instance.setVisibility(this.visibilities[header.name]);
     return c;
   }
 
@@ -183,6 +198,10 @@ export class SearchTableComponent implements OnInit {
         c.instance.setValue(header.name, defaultValue.value);
       }
     }
+    if (this.visibilities[header.name] !== true && this.visibilities[header.name] !== false) {
+      this.visibilities[header.name] = true;
+    }
+    c.instance.setVisibility(this.visibilities[header.name]);
     return c;
   }
 

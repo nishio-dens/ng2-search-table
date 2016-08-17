@@ -1,4 +1,5 @@
 import {Component, Input, Output, OnChanges, EventEmitter, HostBinding} from "@angular/core";
+import {TableHeader} from "./table-header";
 
 @Component({
   moduleId: module.id,
@@ -10,13 +11,14 @@ import {Component, Input, Output, OnChanges, EventEmitter, HostBinding} from "@a
   `
 })
 
-export class SimpleHeaderComponent {
+export class SimpleHeaderComponent implements TableHeader {
   name: string;
   model: any = {};
   eventEmitter: any = new EventEmitter();
 
   @HostBinding("hidden") isHidden: boolean = false;
 
-  ngOnInit() {
+  setVisibility(visible: boolean): void {
+    this.isHidden = !visible;
   }
 }

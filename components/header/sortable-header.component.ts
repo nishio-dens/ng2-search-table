@@ -1,4 +1,5 @@
 import {Component, Input, Output, OnChanges, EventEmitter, HostBinding} from "@angular/core";
+import {TableHeader} from "./table-header";
 
 @Component({
   moduleId: module.id,
@@ -18,7 +19,7 @@ import {Component, Input, Output, OnChanges, EventEmitter, HostBinding} from "@a
   `
 })
 
-export class SortableHeaderComponent {
+export class SortableHeaderComponent implements TableHeader {
   name: string;
   model: any = {};
   eventEmitter: any = new EventEmitter();
@@ -45,5 +46,9 @@ export class SortableHeaderComponent {
       model: this.model,
       name: this.name
     });
+  }
+
+  setVisibility(visible: boolean): void {
+    this.isHidden = !visible;
   }
 }
