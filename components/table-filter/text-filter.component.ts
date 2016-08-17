@@ -1,5 +1,6 @@
 import {Component, EventEmitter, HostBinding} from "@angular/core";
 import {FormControl} from "@angular/forms";
+import {TableFilter} from "./table-filter";
 
 @Component({
   moduleId: module.id,
@@ -11,7 +12,7 @@ import {FormControl} from "@angular/forms";
   `
 })
 
-export class TextFilterComponent {
+export class TextFilterComponent implements TableFilter {
   name: string;
   model: any = {};
   debounceMillSeconds: number = 300;
@@ -24,18 +25,17 @@ export class TextFilterComponent {
 
   ngOnInit() {
     this.termControl = new FormControl();
-    this.termControl.valueChanges.debounceTime(this.debounceMillSeconds).subscribe(newValue => {
-      if (this.termControl.dirty) {
-        this.eventEmitter.emit({
-          value: newValue,
-          model: this.model,
-          name: this.name
-        });
-      }
+    this.termControl.valueChanges.subscribe(newValue => {
+      let value = newValue || "";
+      this.eventEmitter.emit({
+        value: value,
+        model: this.model,
+        name: this.name
+      });
     });
   }
 
-  reset(): void {
-    this.term = "";
+  setValue(name: string, value: any): void {
+    this.term = value;
   }
 }

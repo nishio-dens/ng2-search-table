@@ -1,5 +1,6 @@
 import {Component, EventEmitter, HostBinding} from "@angular/core";
 import {FormControl} from "@angular/forms";
+import {TableFilter} from "./table-filter";
 
 @Component({
   moduleId: module.id,
@@ -24,10 +25,9 @@ import {FormControl} from "@angular/forms";
   `
 })
 
-export class FromToTextFilterComponent {
+export class FromToTextFilterComponent implements TableFilter {
   name: string;
   model: any = {};
-  debounceMillSeconds: number = 300;
   eventEmitter: any = new EventEmitter();
 
   @HostBinding("hidden") isHidden: boolean = false;
@@ -51,21 +51,22 @@ export class FromToTextFilterComponent {
     );
   }
 
-  reset(): void {
-    this.fromTerm = "";
-    this.toTerm = "";
+  setValue(name: string, value: any): void {
+    if (this.model.multipleFilter[0].name === name) {
+      this.fromTerm = value;
+    } else if (this.model.multipleFilter[1].name === name) {
+      this.toTerm = value;
+    }
   }
 
   private setValueChangeEmitter(control: FormControl, controlName: string) {
-    control.valueChanges.debounceTime(this.debounceMillSeconds).subscribe(newValue => {
-      if (control.dirty) {
-        let newValue = control === this.termFromControl ? this.fromTerm : this.toTerm;
-        this.eventEmitter.emit({
-          value: newValue,
-          model: this.model,
-          name: controlName
-        });
-      }
+    control.valueChanges.subscribe(newValue => {
+      let value = (control === this.termFromControl ? this.fromTerm : this.toTerm) || "";
+      this.eventEmitter.emit({
+        value: value,
+        model: this.model,
+        name: controlName
+      });
     });
   }
 }

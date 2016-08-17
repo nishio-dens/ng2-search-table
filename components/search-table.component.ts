@@ -1,6 +1,6 @@
 import {
   Component, OnInit, ViewContainerRef,
-  ComponentResolver, ViewChild, Compiler
+  ComponentResolver, ViewChild, Compiler, EventEmitter
 } from "@angular/core";
 import {SearchTableService} from "../services/search-table.service";
 import {NoHeaderComponent} from "./header/no-header.component";
@@ -46,6 +46,13 @@ export class SearchTableComponent implements OnInit {
   private pagePer: number = 20;
   private totalCount: number = 0;
 
+  private debounceSearchEventEmitter: EventEmitter<any>;
+  private debounceTime: number = 200; /* ms */
+
+  private headerInstances: any = {};
+  private filterInstances: any = {};
+  private defaultValues: any = {};
+
   constructor(
     private componentResolver: ComponentResolver,
     private searchTableService: SearchTableService,
@@ -53,24 +60,25 @@ export class SearchTableComponent implements OnInit {
   ) {}
 
   ngOnInit() {
+    this.debounceSearchEventEmitter = new EventEmitter<any>();
+    this.debounceSearchEventEmitter
+      .debounceTime(this.debounceTime)
+      .subscribe((_: any) => this.search());
+
     this.parseConfig(this.config);
     this.columns.forEach(header => {
       let headerComponent = header.headerComponent || NoHeaderComponent;
       this.compiler.compileComponentAsync(headerComponent).then((factory) => {
         let c: any = this.createHeaderTableComponent(factory, header, this.headerViewComponents);
-        header.headerInstance = c.instance;
+        this.headerInstances[header.name] = c.instance;
       });
 
       let filterComponent = header.filterComponent || NoFilterComponent;
       this.compiler.compileComponentAsync(filterComponent).then((factory) => {
         let c: any = this.createFilterTableComponent(factory, header, this.headerFilterComponents);
-        header.filterInstance = c.instance;
+        this.filterInstances[header.name] = c.instance;
       });
     });
-  }
-
-  ngAfterViewInit(): void {
-    this.search();
   }
 
   getCurrentPage(): number {
@@ -95,53 +103,7 @@ export class SearchTableComponent implements OnInit {
     this.setCurrentPage(1);
   }
 
-  private parseConfig(config: any): void {
-    if (config.defaultPagePer) {
-      this.pagePer = config.defaultPagePer;
-    }
-  }
-
-  private setTotalCount(count: number): void {
-    if (this.totalCount !== count) {
-      this.currentPage = 1;
-    }
-    this.totalCount = count;
-  }
-
-  private createHeaderTableComponent(factory: any, header: any, viewComponents: any): any {
-    let c: any = viewComponents.createComponent(factory);
-    c.instance.name = header.name;
-    c.instance.model = header.model;
-    c.instance.eventEmitter.subscribe((v: any) => {
-      this.sortCondition = {};
-      this.sortCondition[v.name] = v.value;
-      this.clearHeaderSortDirection(v.name);
-      this.search();
-    });
-    return c;
-  }
-
-  private createFilterTableComponent(factory: any, header: any, viewComponents: any): any {
-    let c: any = viewComponents.createComponent(factory);
-    c.instance.name = header.name;
-    c.instance.model = header.model;
-    c.instance.eventEmitter.subscribe((v: any) => {
-      this.filterConditions[v.name] = v.value;
-      this.currentPage = 1;
-      this.search();
-    });
-    return c;
-  }
-
-  private clearHeaderSortDirection(without?: string): void {
-    this.columns.forEach((v: any) => {
-      if (v.name !== without) {
-        v.headerInstance.model.direction = "";
-      }
-    });
-  }
-
-  private search(): void {
+  search(): void {
     let searchParams = {
       page: this.getCurrentPage(),
       per: this.getPagePer(),
@@ -155,5 +117,82 @@ export class SearchTableComponent implements OnInit {
         this.setTotalCount(r.totalCount);
         this.dataRows = r.results;
       });
+  }
+
+  setSortDirection(name: string, direction: string): void {
+    this.sortCondition = {};
+    this.sortCondition[name] = direction;
+    this.clearHeaderSortDirection(name);
+  }
+
+  setFilterValue(name: string, value: any, subComponentName?: string): void {
+    let instance = this.filterInstances[name];
+    if (instance) {
+      if (subComponentName) {
+        instance.setValue(subComponentName, value);
+      } else {
+        instance.setValue(name, value);
+      }
+    }
+    this.defaultValues[name] = { value: value, subComponentName: subComponentName };
+    this.resetCurrentPage();
+  }
+
+  private parseConfig(config: any): void {
+    if (config.defaultPagePer) {
+      this.pagePer = config.defaultPagePer;
+    }
+  }
+
+  private setTotalCount(count: number): void {
+    this.totalCount = count;
+  }
+
+  private resetCurrentPage(): void {
+    this.currentPage = 1;
+  }
+
+  private createHeaderTableComponent(factory: any, header: any, viewComponents: any): any {
+    let c: any = viewComponents.createComponent(factory);
+    c.instance.name = header.name;
+    c.instance.model = header.model;
+    c.instance.eventEmitter.subscribe((v: any) => {
+      this.setSortDirection(v.name, v.value);
+      this.search();
+    });
+    if (this.sortCondition[header.name]) {
+      c.instance.model.direction = this.sortCondition[header.name];
+    }
+    return c;
+  }
+
+  private createFilterTableComponent(factory: any, header: any, viewComponents: any): any {
+    let c: any = viewComponents.createComponent(factory);
+    c.instance.name = header.name;
+    c.instance.model = header.model;
+    c.instance.eventEmitter.subscribe((v: any) => {
+      this.filterConditions[v.name] = v.value;
+      this.resetCurrentPage();
+      this.debounceSearchEventEmitter.emit(true);
+    });
+    let defaultValue: any = this.defaultValues[header.name];
+    if (defaultValue) {
+      if (defaultValue.subComponentName) {
+        c.instance.setValue(defaultValue.subComponentName, defaultValue.value);
+      } else {
+        c.instance.setValue(header.name, defaultValue.value);
+      }
+    }
+    return c;
+  }
+
+  private clearHeaderSortDirection(without?: string): void {
+    if (this.columns) {
+      this.columns.forEach((v: any) => {
+        if (v.name !== without) {
+          this.headerInstances[v.name].model.direction = "";
+        }
+      });
+    }
   }
 }
