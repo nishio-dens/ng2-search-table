@@ -1,6 +1,8 @@
 {
   "name": "ng2-search-table",
-  "description": "TODO",
+  "version": "0.0.1",
+  "author": "Shinsuke Nishio <nishio@densan-labs.net>",
+  "description": "ng2-search-table is angular2 components to display remote data in a table",
   "scripts": {
     "watch": "tsc -w",
     "prepublish": "tsc && node make.js",
@@ -8,18 +10,18 @@
   },
   "repository": {
     "type": "git",
-    "url": "TODO"
+    "url": "https://github.com/nishio-dens/ng2-search-table"
   },
   "keywords": [
-    "angular2"
+    "angular2",
+    "table"
   ],
-  "author": "Shinsuke Nishio",
   "license": "MIT",
   "bugs": {
-    "url": "TODO"
+    "url": "https://github.com/nishio-dens/ng2-search-table/issues"
   },
   "main": "ng2-search-table.js",
-  "homepage": "TODO",
+  "homepage": "https://github.com/nishio-dens/ng2-search-table",
   "peerDependencies": {
     "@angular/core": "^2.0.0-rc.5",
     "@angular/http": "^2.0.0-rc.5",
