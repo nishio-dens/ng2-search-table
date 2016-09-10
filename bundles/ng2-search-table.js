@@ -1,204 +1,3 @@
-System.registerDynamic("components/search-table.component", ["@angular/core", "../services/search-table.service", "./header/no-header.component", "./table-filter/no-filter.component"], true, function($__require, exports, module) {
-  "use strict";
-  ;
-  var define,
-      global = this || self,
-      GLOBAL = global;
-  var __decorate = (this && this.__decorate) || function(decorators, target, key, desc) {
-    var c = arguments.length,
-        r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc,
-        d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function")
-      r = Reflect.decorate(decorators, target, key, desc);
-    else
-      for (var i = decorators.length - 1; i >= 0; i--)
-        if (d = decorators[i])
-          r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-  };
-  var __metadata = (this && this.__metadata) || function(k, v) {
-    if (typeof Reflect === "object" && typeof Reflect.metadata === "function")
-      return Reflect.metadata(k, v);
-  };
-  var core_1 = $__require('@angular/core');
-  var search_table_service_1 = $__require('../services/search-table.service');
-  var no_header_component_1 = $__require('./header/no-header.component');
-  var no_filter_component_1 = $__require('./table-filter/no-filter.component');
-  var SearchTableComponent = (function() {
-    function SearchTableComponent(componentResolver, searchTableService, compiler) {
-      this.componentResolver = componentResolver;
-      this.searchTableService = searchTableService;
-      this.compiler = compiler;
-      this.config = {};
-      this.dataRows = [];
-      this.headerComponents = [];
-      this.sortCondition = {};
-      this.filterConditions = {};
-      this.currentPage = 1;
-      this.pagePer = 20;
-      this.totalCount = 0;
-      this.debounceTime = 200;
-      this.headerInstances = {};
-      this.filterInstances = {};
-      this.defaultValues = {};
-      this.visibilities = {};
-    }
-    SearchTableComponent.prototype.ngOnInit = function() {
-      var _this = this;
-      this.debounceSearchEventEmitter = new core_1.EventEmitter();
-      this.debounceSearchEventEmitter.debounceTime(this.debounceTime).subscribe(function(_) {
-        return _this.search();
-      });
-      this.parseConfig(this.config);
-      this.columns.forEach(function(header) {
-        var headerComponent = header.headerComponent || no_header_component_1.NoHeaderComponent;
-        _this.compiler.compileComponentAsync(headerComponent).then(function(factory) {
-          var c = _this.createHeaderTableComponent(factory, header, _this.headerViewComponents);
-          _this.headerInstances[header.name] = c.instance;
-        });
-        var filterComponent = header.filterComponent || no_filter_component_1.NoFilterComponent;
-        _this.compiler.compileComponentAsync(filterComponent).then(function(factory) {
-          var c = _this.createFilterTableComponent(factory, header, _this.headerFilterComponents);
-          _this.filterInstances[header.name] = c.instance;
-        });
-      });
-    };
-    SearchTableComponent.prototype.getCurrentPage = function() {
-      return this.currentPage;
-    };
-    SearchTableComponent.prototype.getPagePer = function() {
-      return this.pagePer;
-    };
-    SearchTableComponent.prototype.getTotalCount = function() {
-      return this.totalCount;
-    };
-    SearchTableComponent.prototype.setCurrentPage = function(page) {
-      this.currentPage = page;
-      this.search();
-    };
-    SearchTableComponent.prototype.setPagePer = function(per) {
-      this.pagePer = per;
-      this.setCurrentPage(1);
-    };
-    SearchTableComponent.prototype.search = function() {
-      var _this = this;
-      var searchParams = {
-        page: this.getCurrentPage(),
-        per: this.getPagePer(),
-        sort: this.sortCondition,
-        filter: this.filterConditions
-      };
-      this.searchTableService.search(this.config.url, searchParams).subscribe(function(r) {
-        _this.setTotalCount(r.totalCount);
-        _this.dataRows = r.results;
-      });
-    };
-    SearchTableComponent.prototype.setSortDirection = function(name, direction) {
-      this.sortCondition = {};
-      this.sortCondition[name] = direction;
-      this.clearHeaderSortDirection(name);
-    };
-    SearchTableComponent.prototype.setFilterValue = function(name, value, subComponentName) {
-      var instance = this.filterInstances[name];
-      if (instance) {
-        if (subComponentName) {
-          instance.setValue(subComponentName, value);
-        } else {
-          instance.setValue(name, value);
-        }
-      }
-      this.defaultValues[name] = {
-        value: value,
-        subComponentName: subComponentName
-      };
-      this.resetCurrentPage();
-    };
-    SearchTableComponent.prototype.setVisibility = function(name, visible) {
-      if (this.headerInstances[name]) {
-        this.headerInstances[name].setVisibility(visible);
-      }
-      if (this.filterInstances[name]) {
-        this.filterInstances[name].setVisibility(visible);
-      }
-      this.visibilities[name] = visible;
-    };
-    SearchTableComponent.prototype.parseConfig = function(config) {
-      if (config.defaultPagePer) {
-        this.pagePer = config.defaultPagePer;
-      }
-    };
-    SearchTableComponent.prototype.setTotalCount = function(count) {
-      this.totalCount = count;
-    };
-    SearchTableComponent.prototype.resetCurrentPage = function() {
-      this.currentPage = 1;
-    };
-    SearchTableComponent.prototype.createHeaderTableComponent = function(factory, header, viewComponents) {
-      var _this = this;
-      var c = viewComponents.createComponent(factory);
-      c.instance.name = header.name;
-      c.instance.model = header.model;
-      c.instance.eventEmitter.subscribe(function(v) {
-        _this.setSortDirection(v.name, v.value);
-        _this.search();
-      });
-      if (this.sortCondition[header.name]) {
-        c.instance.model.direction = this.sortCondition[header.name];
-      }
-      if (this.visibilities[header.name] !== true && this.visibilities[header.name] !== false) {
-        this.visibilities[header.name] = true;
-      }
-      c.instance.setVisibility(this.visibilities[header.name]);
-      return c;
-    };
-    SearchTableComponent.prototype.createFilterTableComponent = function(factory, header, viewComponents) {
-      var _this = this;
-      var c = viewComponents.createComponent(factory);
-      c.instance.name = header.name;
-      c.instance.model = header.model;
-      c.instance.eventEmitter.subscribe(function(v) {
-        _this.filterConditions[v.name] = v.value;
-        _this.resetCurrentPage();
-        _this.debounceSearchEventEmitter.emit(true);
-      });
-      var defaultValue = this.defaultValues[header.name];
-      if (defaultValue) {
-        if (defaultValue.subComponentName) {
-          c.instance.setValue(defaultValue.subComponentName, defaultValue.value);
-        } else {
-          c.instance.setValue(header.name, defaultValue.value);
-        }
-      }
-      if (this.visibilities[header.name] !== true && this.visibilities[header.name] !== false) {
-        this.visibilities[header.name] = true;
-      }
-      c.instance.setVisibility(this.visibilities[header.name]);
-      return c;
-    };
-    SearchTableComponent.prototype.clearHeaderSortDirection = function(without) {
-      var _this = this;
-      if (this.columns) {
-        this.columns.forEach(function(v) {
-          if (v.name !== without) {
-            _this.headerInstances[v.name].model.direction = "";
-          }
-        });
-      }
-    };
-    __decorate([core_1.ViewChild("headerViewComponents", {read: core_1.ViewContainerRef}), __metadata('design:type', Object)], SearchTableComponent.prototype, "headerViewComponents", void 0);
-    __decorate([core_1.ViewChild("headerFilterComponents", {read: core_1.ViewContainerRef}), __metadata('design:type', Object)], SearchTableComponent.prototype, "headerFilterComponents", void 0);
-    SearchTableComponent = __decorate([core_1.Component({
-      moduleId: module.id,
-      selector: "search-table",
-      inputs: ["tableClass", "columns", "config"],
-      template: "\n  <table [ngClass]=\"tableClass\">\n    <thead>\n      <tr>\n        <template #headerViewComponents></template>\n      </tr>\n      <tr>\n        <template #headerFilterComponents></template>\n      </tr>\n    </thead>\n    <ng-content></ng-content>\n  </table>\n  "
-    }), __metadata('design:paramtypes', [core_1.ComponentResolver, search_table_service_1.SearchTableService, core_1.Compiler])], SearchTableComponent);
-    return SearchTableComponent;
-  }());
-  exports.SearchTableComponent = SearchTableComponent;
-  return module.exports;
-});
-
 System.registerDynamic("services/search-table.service", ["@angular/core", "@angular/http"], true, function($__require, exports, module) {
   "use strict";
   ;
@@ -752,5 +551,213 @@ System.registerDynamic("ng2-search-table", ["@angular/core", "@angular/common", 
     return Ng2SearchTableModule;
   }());
   exports.Ng2SearchTableModule = Ng2SearchTableModule;
+  return module.exports;
+});
+
+System.registerDynamic("components/search-table.component", ["@angular/core", "../services/search-table.service", "./header/no-header.component", "./table-filter/no-filter.component", "../ng2-search-table"], true, function($__require, exports, module) {
+  "use strict";
+  ;
+  var define,
+      global = this || self,
+      GLOBAL = global;
+  var __decorate = (this && this.__decorate) || function(decorators, target, key, desc) {
+    var c = arguments.length,
+        r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc,
+        d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function")
+      r = Reflect.decorate(decorators, target, key, desc);
+    else
+      for (var i = decorators.length - 1; i >= 0; i--)
+        if (d = decorators[i])
+          r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+  };
+  var __metadata = (this && this.__metadata) || function(k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function")
+      return Reflect.metadata(k, v);
+  };
+  var core_1 = $__require('@angular/core');
+  var search_table_service_1 = $__require('../services/search-table.service');
+  var no_header_component_1 = $__require('./header/no-header.component');
+  var no_filter_component_1 = $__require('./table-filter/no-filter.component');
+  var ng2_search_table_1 = $__require('../ng2-search-table');
+  var SearchTableComponent = (function() {
+    function SearchTableComponent(componentResolver, searchTableService, compiler) {
+      this.componentResolver = componentResolver;
+      this.searchTableService = searchTableService;
+      this.compiler = compiler;
+      this.config = {};
+      this.dataRows = [];
+      this.headerComponents = [];
+      this.sortCondition = {};
+      this.filterConditions = {};
+      this.currentPage = 1;
+      this.pagePer = 20;
+      this.totalCount = 0;
+      this.debounceTime = 200;
+      this.headerInstances = {};
+      this.filterInstances = {};
+      this.defaultValues = {};
+      this.visibilities = {};
+    }
+    SearchTableComponent.prototype.ngOnInit = function() {
+      var _this = this;
+      this.debounceSearchEventEmitter = new core_1.EventEmitter();
+      this.debounceSearchEventEmitter.debounceTime(this.debounceTime).subscribe(function(_) {
+        return _this.search();
+      });
+      this.parseConfig(this.config);
+      this.columns.forEach(function(header) {
+        var headerComponent = header.headerComponent || no_header_component_1.NoHeaderComponent;
+        _this.compiler.compileModuleAndAllComponentsAsync(ng2_search_table_1.Ng2SearchTableModule).then(function(moduleFactory) {
+          var factory = moduleFactory.componentFactories.find(function(x) {
+            return x.componentType == headerComponent;
+          });
+          var c = _this.createHeaderTableComponent(factory, header, _this.headerViewComponents);
+          _this.headerInstances[header.name] = c.instance;
+        });
+        var filterComponent = header.filterComponent || no_filter_component_1.NoFilterComponent;
+        _this.compiler.compileModuleAndAllComponentsAsync(ng2_search_table_1.Ng2SearchTableModule).then(function(moduleFactory) {
+          var factory = moduleFactory.componentFactories.find(function(x) {
+            return x.componentType == filterComponent;
+          });
+          var c = _this.createFilterTableComponent(factory, header, _this.headerFilterComponents);
+          _this.filterInstances[header.name] = c.instance;
+        });
+      });
+    };
+    SearchTableComponent.prototype.getCurrentPage = function() {
+      return this.currentPage;
+    };
+    SearchTableComponent.prototype.getPagePer = function() {
+      return this.pagePer;
+    };
+    SearchTableComponent.prototype.getTotalCount = function() {
+      return this.totalCount;
+    };
+    SearchTableComponent.prototype.setCurrentPage = function(page) {
+      this.currentPage = page;
+      this.search();
+    };
+    SearchTableComponent.prototype.setPagePer = function(per) {
+      this.pagePer = per;
+      this.setCurrentPage(1);
+    };
+    SearchTableComponent.prototype.search = function() {
+      var _this = this;
+      var searchParams = {
+        page: this.getCurrentPage(),
+        per: this.getPagePer(),
+        sort: this.sortCondition,
+        filter: this.filterConditions
+      };
+      this.searchTableService.search(this.config.url, searchParams).subscribe(function(r) {
+        _this.setTotalCount(r.totalCount);
+        _this.dataRows = r.results;
+      });
+    };
+    SearchTableComponent.prototype.setSortDirection = function(name, direction) {
+      this.sortCondition = {};
+      this.sortCondition[name] = direction;
+      this.clearHeaderSortDirection(name);
+    };
+    SearchTableComponent.prototype.setFilterValue = function(name, value, subComponentName) {
+      var instance = this.filterInstances[name];
+      if (instance) {
+        if (subComponentName) {
+          instance.setValue(subComponentName, value);
+        } else {
+          instance.setValue(name, value);
+        }
+      }
+      this.defaultValues[name] = {
+        value: value,
+        subComponentName: subComponentName
+      };
+      this.resetCurrentPage();
+    };
+    SearchTableComponent.prototype.setVisibility = function(name, visible) {
+      if (this.headerInstances[name]) {
+        this.headerInstances[name].setVisibility(visible);
+      }
+      if (this.filterInstances[name]) {
+        this.filterInstances[name].setVisibility(visible);
+      }
+      this.visibilities[name] = visible;
+    };
+    SearchTableComponent.prototype.parseConfig = function(config) {
+      if (config.defaultPagePer) {
+        this.pagePer = config.defaultPagePer;
+      }
+    };
+    SearchTableComponent.prototype.setTotalCount = function(count) {
+      this.totalCount = count;
+    };
+    SearchTableComponent.prototype.resetCurrentPage = function() {
+      this.currentPage = 1;
+    };
+    SearchTableComponent.prototype.createHeaderTableComponent = function(factory, header, viewComponents) {
+      var _this = this;
+      var c = viewComponents.createComponent(factory);
+      c.instance.name = header.name;
+      c.instance.model = header.model;
+      c.instance.eventEmitter.subscribe(function(v) {
+        _this.setSortDirection(v.name, v.value);
+        _this.search();
+      });
+      if (this.sortCondition[header.name]) {
+        c.instance.model.direction = this.sortCondition[header.name];
+      }
+      if (this.visibilities[header.name] !== true && this.visibilities[header.name] !== false) {
+        this.visibilities[header.name] = true;
+      }
+      c.instance.setVisibility(this.visibilities[header.name]);
+      return c;
+    };
+    SearchTableComponent.prototype.createFilterTableComponent = function(factory, header, viewComponents) {
+      var _this = this;
+      var c = viewComponents.createComponent(factory);
+      c.instance.name = header.name;
+      c.instance.model = header.model;
+      c.instance.eventEmitter.subscribe(function(v) {
+        _this.filterConditions[v.name] = v.value;
+        _this.resetCurrentPage();
+        _this.debounceSearchEventEmitter.emit(true);
+      });
+      var defaultValue = this.defaultValues[header.name];
+      if (defaultValue) {
+        if (defaultValue.subComponentName) {
+          c.instance.setValue(defaultValue.subComponentName, defaultValue.value);
+        } else {
+          c.instance.setValue(header.name, defaultValue.value);
+        }
+      }
+      if (this.visibilities[header.name] !== true && this.visibilities[header.name] !== false) {
+        this.visibilities[header.name] = true;
+      }
+      c.instance.setVisibility(this.visibilities[header.name]);
+      return c;
+    };
+    SearchTableComponent.prototype.clearHeaderSortDirection = function(without) {
+      var _this = this;
+      if (this.columns) {
+        this.columns.forEach(function(v) {
+          if (v.name !== without) {
+            _this.headerInstances[v.name].model.direction = "";
+          }
+        });
+      }
+    };
+    __decorate([core_1.ViewChild("headerViewComponents", {read: core_1.ViewContainerRef}), __metadata('design:type', Object)], SearchTableComponent.prototype, "headerViewComponents", void 0);
+    __decorate([core_1.ViewChild("headerFilterComponents", {read: core_1.ViewContainerRef}), __metadata('design:type', Object)], SearchTableComponent.prototype, "headerFilterComponents", void 0);
+    SearchTableComponent = __decorate([core_1.Component({
+      moduleId: module.id,
+      selector: "search-table",
+      inputs: ["tableClass", "columns", "config"],
+      template: "\n  <table [ngClass]=\"tableClass\">\n    <thead>\n      <tr>\n        <template #headerViewComponents></template>\n      </tr>\n      <tr>\n        <template #headerFilterComponents></template>\n      </tr>\n    </thead>\n    <ng-content></ng-content>\n  </table>\n  "
+    }), __metadata('design:paramtypes', [core_1.ComponentFactoryResolver, search_table_service_1.SearchTableService, core_1.Compiler])], SearchTableComponent);
+    return SearchTableComponent;
+  }());
+  exports.SearchTableComponent = SearchTableComponent;
   return module.exports;
 });
