@@ -1,6 +1,6 @@
 {
   "name": "ng2-search-table",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "author": "Shinsuke Nishio <nishio@densan-labs.net>",
   "description": "ng2-search-table is angular2 components to display remote data in a table",
   "scripts": {
@@ -23,19 +23,19 @@
   "main": "ng2-search-table.js",
   "homepage": "https://github.com/nishio-dens/ng2-search-table",
   "peerDependencies": {
-    "@angular/core": "^2.0.0-rc.5",
-    "@angular/http": "^2.0.0-rc.5",
-    "@angular/common": "^2.0.0-rc.5",
+    "@angular/core": "^2.0.0-rc.6",
+    "@angular/http": "^2.0.0-rc.6",
+    "@angular/common": "^2.0.0-rc.6",
     "@angular/forms": "0.3.0"
   },
   "devDependencies": {
-    "@angular/common": "^2.0.0-rc.5",
-    "@angular/compiler": "^2.0.0-rc.5",
-    "@angular/core": "^2.0.0-rc.5",
-    "@angular/http": "^2.0.0-rc.5",
+    "@angular/common": "^2.0.0-rc.6",
+    "@angular/compiler": "^2.0.0-rc.6",
+    "@angular/core": "^2.0.0-rc.6",
+    "@angular/http": "^2.0.0-rc.6",
     "@angular/forms": "0.3.0",
-    "@angular/platform-browser": "^2.0.0-rc.5",
-    "@angular/platform-browser-dynamic": "^2.0.0-rc.5",
+    "@angular/platform-browser": "^2.0.0-rc.6",
+    "@angular/platform-browser-dynamic": "^2.0.0-rc.6",
     "@types/es6-shim": "0.0.29",
     "@types/hammerjs": "^2.0.30",
     "@types/jasmine": "^2.2.31",
