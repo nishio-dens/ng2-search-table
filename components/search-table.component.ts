@@ -1,10 +1,12 @@
 import {
   Component, OnInit, ViewContainerRef,
-  ComponentResolver, ViewChild, Compiler, EventEmitter
+  ViewChild, Compiler, EventEmitter,
+  ComponentFactoryResolver
 } from "@angular/core";
 import {SearchTableService} from "../services/search-table.service";
 import {NoHeaderComponent} from "./header/no-header.component";
 import {NoFilterComponent} from "./table-filter/no-filter.component";
+import {Ng2SearchTableModule} from '../ng2-search-table';
 
 @Component({
   moduleId: module.id,
@@ -55,7 +57,7 @@ export class SearchTableComponent implements OnInit {
   private visibilities: any = {};
 
   constructor(
-    private componentResolver: ComponentResolver,
+    private componentResolver: ComponentFactoryResolver,
     private searchTableService: SearchTableService,
     private compiler: Compiler
   ) {}
@@ -69,13 +71,15 @@ export class SearchTableComponent implements OnInit {
     this.parseConfig(this.config);
     this.columns.forEach(header => {
       let headerComponent = header.headerComponent || NoHeaderComponent;
-      this.compiler.compileComponentAsync(headerComponent).then((factory) => {
+      this.compiler.compileModuleAndAllComponentsAsync(Ng2SearchTableModule).then((moduleFactory) => {
+        let factory = moduleFactory.componentFactories.find(x => x.componentType == headerComponent);
         let c: any = this.createHeaderTableComponent(factory, header, this.headerViewComponents);
         this.headerInstances[header.name] = c.instance;
       });
 
       let filterComponent = header.filterComponent || NoFilterComponent;
-      this.compiler.compileComponentAsync(filterComponent).then((factory) => {
+      this.compiler.compileModuleAndAllComponentsAsync(Ng2SearchTableModule).then((moduleFactory) => {
+        let factory = moduleFactory.componentFactories.find(x => x.componentType == filterComponent);
         let c: any = this.createFilterTableComponent(factory, header, this.headerFilterComponents);
         this.filterInstances[header.name] = c.instance;
       });
