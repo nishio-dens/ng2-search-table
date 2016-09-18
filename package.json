@@ -1,6 +1,6 @@
 {
   "name": "ng2-search-table",
-  "version": "0.0.2",
+  "version": "1.0.0",
   "author": "Shinsuke Nishio <nishio@densan-labs.net>",
   "description": "ng2-search-table is angular2 components to display remote data in a table",
   "scripts": {
